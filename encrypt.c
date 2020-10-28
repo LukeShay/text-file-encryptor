@@ -86,3 +86,70 @@ int get_output_count(int c) {
 	return output_counts[c];
 }
 
+/* Start of code by Robert Shay */
+
+typedef struct count {
+	char c;
+	int occur;
+} count;
+
+count counts[26];
+
+// TODO
+void reset_requested() {
+
+}
+
+// TODO
+void reset_finished() {
+
+}
+
+void *read_file() {
+
+}
+
+void get_input(char *cmdline) {
+	fflush(stdout);
+	printf("Enter buffer size: ");
+
+	fgets(cmdline, 100, stdin);
+	ferror(stdin);
+}
+
+int main(int argc, char** argv) {
+	char* infile;
+	char* outfile;
+	char cmdline[100];
+	int buffer_size;
+	pthread_t reader, writer, encryptor, input, output;
+	int reader_id = 1, writer_id = 2, encryptor_id = 3, input_id = 4, output_id = 5;
+
+	if (argc != 3) {
+  	printf("Invalid arguments\n");
+		return 1;
+	}
+
+	open_input(argv[1]);
+	open_output(argv[2]);
+
+	get_input(cmdline);
+
+	printf("\n%s\n", cmdline);
+
+	buffer_size = atoi(cmdline);
+
+	pthread_create(&reader, NULL, read_file, &reader_id);
+	pthread_create(&writer, NULL, read_file, &writer_id);
+	pthread_create(&encryptor, NULL, read_file, &encryptor_id);
+	pthread_create(&input, NULL, read_file, &input_id);
+	pthread_create(&output, NULL, read_file, &output_id);
+
+	pthread_join(reader, NULL);
+	pthread_join(writer, NULL);
+	pthread_join(encryptor, NULL);
+	pthread_join(input, NULL);
+	pthread_join(output, NULL);
+
+  return 0;
+}
