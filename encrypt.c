@@ -95,18 +95,84 @@ typedef struct count {
 
 count counts[26];
 
-// TODO
+// TODO: Implement
 void reset_requested() {
 
 }
 
-// TODO
+// TODO: Implement
 void reset_finished() {
 
 }
 
-void *read_file() {
+/**
+ * Reads the input file for the next character. This function will block until
+ * the unencrypted buffer is empty.
+ */
+int read_input_file() {
 
+	return 0;
+}
+
+/**
+ * Waits for the unencrypted buffer to be unlocked and will then lock it.
+ */
+void lock_unencrypted_buffer() {
+	
+}
+
+/**
+ * Unlocks the unencrypted buffer.
+ */
+void unlock_unencrypted_buffer() {
+	
+}
+
+/**
+ * Reads the buffer containing the unencrypted character. This function will
+ * block until there is a character in the buffer.
+ */
+int read_unencrypted_buffer() {
+	
+	return 0;
+}
+
+/**
+ * Waits for the encrypted buffer to be unlocked and will then lock it.
+ */
+void lock_encrypted_buffer() {
+	
+}
+
+/**
+ * Unlocks the encrypted buffer.
+ */
+void unlock_encrypted_buffer() {
+	
+}
+
+void *reader_func() {
+	while (!feof(input_file)) {
+		int c = read_input_file();
+		lock_unencrypted_buffer();
+
+		// TODO: Add c to buffer
+		
+		unlock_unencrypted_buffer();
+		count_input(c);
+	}
+}
+
+void *encryptor_func() {
+	while (!feof(output_file)) {
+		int c = read_unencrypted_buffer();
+		lock_encrypted_buffer();
+
+		// TODO: Add c to buffer
+		
+		unlock_encrypted_buffer();
+		count_output(c);
+	}
 }
 
 void get_input(char *cmdline) {
@@ -139,11 +205,11 @@ int main(int argc, char** argv) {
 
 	buffer_size = atoi(cmdline);
 
-	pthread_create(&reader, NULL, read_file, &reader_id);
-	pthread_create(&writer, NULL, read_file, &writer_id);
-	pthread_create(&encryptor, NULL, read_file, &encryptor_id);
-	pthread_create(&input, NULL, read_file, &input_id);
-	pthread_create(&output, NULL, read_file, &output_id);
+	pthread_create(&reader, NULL, reader_func, &reader_id);
+	pthread_create(&writer, NULL, reader_func, &writer_id);
+	pthread_create(&encryptor, NULL, encryptor_func, &encryptor_id);
+	pthread_create(&input, NULL, reader_func, &input_id);
+	pthread_create(&output, NULL, reader_func, &output_id);
 
 	pthread_join(reader, NULL);
 	pthread_join(writer, NULL);
