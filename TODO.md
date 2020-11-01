@@ -1,2 +1,0 @@
-- [ ] Fix counting
-- [ ] Add documentation

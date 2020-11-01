@@ -1,5 +1,5 @@
 CC=gcc
-CFLAGS=-pthread -ggdb3 -O2
+CFLAGS=-pthread -ggdb3 -O2 -Werror
 DEPS = encrypt.h
 OBJ = encrypt.o main.o
 

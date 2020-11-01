@@ -1,3 +1,10 @@
+/**
+ * This file contains all the specified functionality in the project
+ * description.
+ * 
+ * Copyright 2020 Robert Shay.
+ */
+
 #include "encrypt.h"
 #include <ctype.h>
 #include <pthread.h>
@@ -30,8 +37,6 @@ sem_t *out_counter_full_sem;
 
 sem_t *out_writer_empty_sem;
 sem_t *out_writer_full_sem;
-
-sem_t *print_order_sem;
 
 /**
  * Prints the the current count for the inputs.
@@ -153,16 +158,6 @@ void *counter_func(void *counter_args) {
     sem_post(args->counter_empty_sem);
   }
 
-  // Print the output
-  if (args->buffer == buffer_in) {
-    print_input_count();
-  } else if (args->buffer == buffer_out) {
-    sem_wait(print_order_sem);
-    print_output_count();
-  }
-
-  sem_post(print_order_sem);
-
   // Exit this thread
   pthread_exit(NULL);
 }
@@ -280,42 +275,39 @@ void cleanup_buffers() {
  * Allocate and initializes semaphores.
  */
 void initialize_semaphores(int buffer_size) {
-  in_counter_empty_sem = malloc(sizeof(sem_t));
-  in_counter_full_sem = malloc(sizeof(sem_t));
-  sem_init(in_counter_empty_sem, 0, buffer_size);
-  sem_init(in_counter_full_sem, 0, 0);
-
   in_encryptor_empty_sem = malloc(sizeof(sem_t));
   in_encryptor_full_sem = malloc(sizeof(sem_t));
   sem_init(in_encryptor_empty_sem, 0, buffer_size);
   sem_init(in_encryptor_full_sem, 0, 0);
 
-  out_counter_empty_sem = malloc(sizeof(sem_t));
-  out_counter_full_sem = malloc(sizeof(sem_t));
-  sem_init(out_counter_empty_sem, 0, buffer_size);
-  sem_init(out_counter_full_sem, 0, 0);
+  in_counter_empty_sem = malloc(sizeof(sem_t));
+  in_counter_full_sem = malloc(sizeof(sem_t));
+  sem_init(in_counter_empty_sem, 0, buffer_size);
+  sem_init(in_counter_full_sem, 0, 0);
 
   out_writer_empty_sem = malloc(sizeof(sem_t));
   out_writer_full_sem = malloc(sizeof(sem_t));
   sem_init(out_writer_empty_sem, 0, buffer_size);
   sem_init(out_writer_full_sem, 0, 0);
 
-  print_order_sem = malloc(sizeof(sem_t));
-  sem_init(print_order_sem, 0, 0);
+  out_counter_empty_sem = malloc(sizeof(sem_t));
+  out_counter_full_sem = malloc(sizeof(sem_t));
+  sem_init(out_counter_empty_sem, 0, buffer_size);
+  sem_init(out_counter_full_sem, 0, 0);
 }
 
 void cleanup_semaphores() {
-  free(in_counter_empty_sem);
-  free(in_counter_full_sem);
   free(in_encryptor_empty_sem);
   free(in_encryptor_full_sem);
 
-  free(out_counter_empty_sem);
-  free(out_counter_full_sem);
+  free(in_counter_empty_sem);
+  free(in_counter_full_sem);
+
   free(out_writer_empty_sem);
   free(out_writer_full_sem);
 
-  free(print_order_sem);
+  free(out_counter_empty_sem);
+  free(out_counter_full_sem);
 }
 
 int main(int argc, char **argv) {
@@ -375,6 +367,9 @@ int main(int argc, char **argv) {
   pthread_join(encryptor_t, NULL);
   pthread_join(output_counter_t, NULL);
   pthread_join(writer_t, NULL);
+
+  print_input_count();
+  print_output_count();
 
   cleanup_semaphores();
   cleanup_buffers();
